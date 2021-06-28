@@ -14,8 +14,10 @@ class ShowEntry extends Component {
       user: null,
       comment: {
         content: '',
-        entryId: ''
+        entryId: '',
+        owner: ''
       },
+      // why are we setting createdId - line 65 setstate
       createdId: null
     }
   }
@@ -55,22 +57,19 @@ class ShowEntry extends Component {
     event.preventDefault()
 
     const { msgAlert, user } = this.props
-    // remove owner
-    const comment = { ...this.state.comment, owner: user._id }
-    console.log('this.props, createComment: ', this.props)
-    console.log('this.state.comment: ', this.state.comment)
+    // removed owner
+    const comment = { ...this.state.comment }
+    comment.entryId = this.props.match.params.id
     createComment(comment, user)
-      .then(res => console.log('res: ', res))
-      .then(res => this.setState({ createdId: res.data.comment._id }))
-      .then(console.log('createdId: ', this.state.createdId))
+      .then(res => this.setState({ createdId: comment.entryId }))
       .then(() => msgAlert({
         heading: 'Create Entry Success!',
-        message: messages.entryCreateSuccess,
+        message: messages.commentCreateSuccess,
         variant: 'success'
       }))
       .catch(() => msgAlert({
         heading: 'Create Entry Failed',
-        message: messages.entryCreateFailure,
+        message: messages.commentCreateFailure,
         variant: 'danger'
       }))
   }
@@ -107,6 +106,9 @@ class ShowEntry extends Component {
           </div>
         </Fragment>
       )
+    } else if (this.state.createdId) {
+      this.props.history.push('/temp')
+      this.props.history.goBack()
     } else {
       entryJsx = (
 
